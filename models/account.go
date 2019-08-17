@@ -70,3 +70,30 @@ func (account *Account) Create() (map[string]interface{}) {
 	response["account"] = account
 	return response
 }
+
+
+func Login(email, password string) (map[string]interface{}) {
+	account := &Account{}
+	err := GetDB().Table("accounts").Where("email = ?", email).First(account).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return utils.Message(false, "Email or password is incorrect")
+		}
+		return utils.Message(false, "Connection error.")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(password))
+	if err != nil  {
+		return utils.Message(false, "Email or password is incorrect")
+	}
+
+	account.Password = ""
+	tk := &Token{UserId: account.ID}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+	account.Token = tokenString
+
+	response := utils.Message(true, "Logged in.")
+	response["account"] = account
+	return response
+}
