@@ -15,7 +15,7 @@ type Group struct {
 
 //TODO: how to check user existence
 func (group *Group) Validate() (map[string]interface{}, bool){
-	if !(utils.IsWord(group.Name) && utils.IsWord(group.Description)){
+	if !(utils.IsAlphaNumeric(group.Name) && utils.IsAlphaNumeric(group.Description)){
 		return utils.Message(false, "Group name and description must contain letters only."), false
 	}
 

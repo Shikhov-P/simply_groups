@@ -27,7 +27,7 @@ type Account struct {
 
 //TODO: display all errors if more than one are present
 func (account *Account) Validate() (map[string]interface{}, bool) {
-	if !(utils.IsWord(account.FirstName) && utils.IsWord(account.LastName)){
+	if !(utils.IsAlphaNumeric(account.FirstName) && utils.IsAlphaNumeric(account.LastName)){
 		return utils.Message(false, "First and last names must contain letters only."), false
 	}
 

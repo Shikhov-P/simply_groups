@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"unicode"
 )
 
@@ -23,10 +24,13 @@ func Respond(w http.ResponseWriter, data map[string]interface{}) {
 	ParseError(err)
 }
 
-func IsWord(word string) bool {
-	for _, letter := range word {
-		if !unicode.IsLetter(letter){
-			return false
+func IsAlphaNumeric(str string) bool {
+	words := strings.Split(str, " ")
+	for _, word := range words {
+		for _, symbol := range word {
+			if !(unicode.IsLetter(symbol) || unicode.IsNumber(symbol)) {
+				return false
+			}
 		}
 	}
 	return true
