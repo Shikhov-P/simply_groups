@@ -14,6 +14,8 @@ func main() {
 
 	router.HandleFunc("/api/user/new", controllers.CreateAccount).Methods("POST")
 	router.HandleFunc("/api/user/login", controllers.Authenticate).Methods("POST")
+	router.HandleFunc("/api/me/groups", controllers.GetCreatedGroupsFor).Methods("GET")
+	router.HandleFunc("/api/groups/new", controllers.CreateGroup).Methods("POST")
 
 	router.Use(app.JwtAuthentication)
 

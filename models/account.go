@@ -17,12 +17,25 @@ type Token struct {
 
 type Account struct {
 	gorm.Model
-	Email string `json:"email"`
-	Password string `json:"password"`
-	Token string `json:"token";sql:"-"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	Token     string `json:"token";sql:"-"`
 }
 
+//TODO: display all errors if more than one are present
 func (account *Account) Validate() (map[string]interface{}, bool) {
+	if !(utils.IsWord(account.FirstName) && utils.IsWord(account.LastName)){
+		return utils.Message(false, "First and last names must contain letters only."), false
+	}
+
+	usernameRegexp := regexp.MustCompile(`^\w+$`)
+	if !usernameRegexp.MatchString(account.Username){
+		return utils.Message(false, "Userame must contain alphanumeric letters only."), false
+	}
+
 	emailRegexp := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	if !emailRegexp.MatchString(account.Email){
 		return utils.Message(false, "Wrong email format."), false
@@ -96,4 +109,15 @@ func Login(email, password string) (map[string]interface{}) {
 	response := utils.Message(true, "Logged in.")
 	response["account"] = account
 	return response
+}
+
+func GetUser(userId uint) *Account {
+	account := &Account{}
+	GetDB().Table("accounts").Where("id = ?", userId).First(account)
+	if account.Email == "" {
+		return nil
+	}
+
+	account.Password = ""
+	return account
 }

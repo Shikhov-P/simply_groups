@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"unicode"
 )
 
 func ParseError(err error) {
@@ -20,4 +21,13 @@ func Respond(w http.ResponseWriter, data map[string]interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(data)
 	ParseError(err)
+}
+
+func IsWord(word string) bool {
+	for _, letter := range word {
+		if !unicode.IsLetter(letter){
+			return false
+		}
+	}
+	return true
 }
