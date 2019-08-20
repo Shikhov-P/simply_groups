@@ -4,6 +4,7 @@ import (
 	"../models"
 	"../utils"
 	"context"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"os"
@@ -51,6 +52,8 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			return
 		}
 
+		fmt.Printf("User %", tk.UserId)
+		fmt.Println(tk.UserId)
 		ctx := context.WithValue(r.Context(), "user", tk.UserId)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)

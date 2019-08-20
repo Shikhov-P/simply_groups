@@ -1,12 +1,12 @@
 package controllers
 
 import (
+	"../models"
+	"../utils"
 	"encoding/json"
-	"github.com/gorilla/mux"
+	//"github.com/gorilla/mux"
 	"net/http"
-	models "../models"
-	utils "../utils"
-	"strconv"
+	//"strconv"
 )
 
 var CreateGroup = func(w http.ResponseWriter, r *http.Request) {
@@ -24,13 +24,8 @@ var CreateGroup = func(w http.ResponseWriter, r *http.Request) {
 
 
 var GetCreatedGroupsFor = func(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	userId, err := strconv.Atoi(params["id"])
-	if err != nil {
-		utils.Respond(w, utils.Message(false, "Group id must be an integer."))
-		return
-	}
-	data := models.GetCreatedGroups(uint(userId))
+	userId := r.Context().Value("user").(uint)
+	data := models.GetCreatedGroups(userId)
 	response := utils.Message(true, "Success.")
 	response["data"] = data
 	utils.Respond(w, response)

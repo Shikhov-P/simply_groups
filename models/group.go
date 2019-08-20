@@ -41,8 +41,8 @@ func (group *Group) Create() map[string]interface{} {
 func GetCreatedGroups(userId uint) []*Group {
 	groups := make([]*Group, 0)
 	err := GetDB().Table("groups").Where("user_id = ?", userId).Find(&groups).Error
-	if err == nil {
-		fmt.Println(err)
+	if err != nil {
+		fmt.Println("Error", err)
 		return nil
 	}
 	return groups

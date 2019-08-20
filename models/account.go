@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	utils "../utils"
+	"strings"
 )
 
 type Token struct {
@@ -22,6 +23,7 @@ type Account struct {
 	Username  string `json:"username"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
+	Groups []Group `gorm:"ForeignKey:AccountRefer";json:"user_groups"'`
 	Token     string `json:"token";sql:"-"`
 }
 
@@ -66,6 +68,7 @@ func (account *Account) Create() (map[string]interface{}) {
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
 	account.Password = string(hashedPassword)
+	account.Email = strings.ToLower(account.Email)
 
 	GetDB().Create(account)
 
@@ -87,6 +90,7 @@ func (account *Account) Create() (map[string]interface{}) {
 
 func Login(email, password string) (map[string]interface{}) {
 	account := &Account{}
+	email = strings.ToLower(email)
 	err := GetDB().Table("accounts").Where("email = ?", email).First(account).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
