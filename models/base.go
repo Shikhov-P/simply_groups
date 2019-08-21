@@ -27,8 +27,8 @@ func init() {
 	utils.ParseError(err)
 
 	db = connection
-	//db.Debug().AutoMigrate(&Account{}, &Contact{})
-	db.Debug().AutoMigrate(&Account{}, &Group{})
+	//db.Model(&User{}).AddForeignKey()
+	db.Debug().AutoMigrate(&User{}, &Group{})
 }
 
 func GetDB() *gorm.DB {

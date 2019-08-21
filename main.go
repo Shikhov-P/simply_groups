@@ -12,10 +12,16 @@ import (
 func main() {
 	router := mux.NewRouter()
 
+	//staticFileDir := http.Dir("./assets/")
+	//staticFileHandler := http.StripPrefix("/assets/", http.FileServer(staticFileDir))
+	//router.PathPrefix("/assets/").Handler(staticFileHandler).Methods("GET")
+
 	router.HandleFunc("/api/user/new", controllers.CreateAccount).Methods("POST")
 	router.HandleFunc("/api/user/login", controllers.Authenticate).Methods("POST")
 	router.HandleFunc("/api/me/groups", controllers.GetCreatedGroupsFor).Methods("GET")
 	router.HandleFunc("/api/groups/new", controllers.CreateGroup).Methods("POST")
+	router.HandleFunc("/api/groups/delete/{groupId}", controllers.DeleteGroup).Methods("DELETE")
+	router.HandleFunc("/api/groups/update/{groupId}", controllers.UpdateGroup).Methods("POST")
 
 	router.Use(app.JwtAuthentication)
 

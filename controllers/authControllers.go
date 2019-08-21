@@ -8,7 +8,7 @@ import (
 )
 
 var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
-	account := &models.Account{}
+	account := &models.User{}
 	err := json.NewDecoder(r.Body).Decode(account)
 	if err != nil {
 		utils.Respond(w, utils.Message(false, "Invalid request."))
@@ -19,7 +19,7 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var Authenticate = func(w http.ResponseWriter, r *http.Request) {
-	account := &models.Account{}
+	account := &models.User{}
 	err := json.NewDecoder(r.Body).Decode(account)
 	if err != nil {
 		utils.Respond(w, utils.Message(false, "Invalid request."))

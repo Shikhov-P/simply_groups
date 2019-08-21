@@ -16,19 +16,19 @@ type Token struct {
 	jwt.StandardClaims
 }
 
-type Account struct {
+type User struct {
 	gorm.Model
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
-	Groups []Group `gorm:"ForeignKey:AccountRefer";json:"user_groups"'`
+	Groups []Group `gorm:"ForeignKey:UserID"`
 	Token     string `json:"token";sql:"-"`
 }
 
 //TODO: display all errors if more than one are present
-func (account *Account) Validate() (map[string]interface{}, bool) {
+func (account *User) Validate() (map[string]interface{}, bool) {
 	if !(utils.IsAlphaNumeric(account.FirstName) && utils.IsAlphaNumeric(account.LastName)){
 		return utils.Message(false, "First and last names must contain letters only."), false
 	}
@@ -48,7 +48,7 @@ func (account *Account) Validate() (map[string]interface{}, bool) {
 		return utils.Message(false, "Use a stronger password."), false
 	}
 
-	temp := &Account{}
+	temp := &User{}
 	err := GetDB().Table("accounts").Where("email = ?", account.Email).First(temp).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return utils.Message(false, "Connection error."), false
@@ -58,10 +58,10 @@ func (account *Account) Validate() (map[string]interface{}, bool) {
 		return utils.Message(false, "Email is already in use."), false
 	}
 
-	return utils.Message(false, "Account is valid."), true
+	return utils.Message(false, "User is valid."), true
 }
 
-func (account *Account) Create() (map[string]interface{}) {
+func (account *User) Create() (map[string]interface{}) {
 	if resp, isValidated := account.Validate(); !isValidated {
 		return resp
 	}
@@ -73,7 +73,7 @@ func (account *Account) Create() (map[string]interface{}) {
 	GetDB().Create(account)
 
 	if account.ID <= 0 {
-		return utils.Message(false, "Account creation error. Please, retry.")
+		return utils.Message(false, "User creation error. Please, retry.")
 	}
 
 	tk := &Token{UserId: account.ID}
@@ -82,14 +82,14 @@ func (account *Account) Create() (map[string]interface{}) {
 	account.Token = tokenString
 	account.Password = ""
 
-	response := utils.Message(true, "Account has been created.")
+	response := utils.Message(true, "User has been created.")
 	response["account"] = account
 	return response
 }
 
 
 func Login(email, password string) (map[string]interface{}) {
-	account := &Account{}
+	account := &User{}
 	email = strings.ToLower(email)
 	err := GetDB().Table("accounts").Where("email = ?", email).First(account).Error
 	if err != nil {
@@ -115,8 +115,8 @@ func Login(email, password string) (map[string]interface{}) {
 	return response
 }
 
-func GetUser(userId uint) *Account {
-	account := &Account{}
+func GetUser(userId uint) *User {
+	account := &User{}
 	GetDB().Table("accounts").Where("id = ?", userId).First(account)
 	if account.Email == "" {
 		return nil
